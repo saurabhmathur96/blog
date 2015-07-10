@@ -8,6 +8,8 @@ dl, dd, ol, ul, figure {
     padding: 0;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
+    -moz-font-smoothing: antialiased !important;
+    font-smoothing: antialiased !important;
     font-feature-settings: "liga";
 }
 
@@ -84,6 +86,15 @@ li {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     font-family: $header-font-family;
+    
+
+}
+
+h1{
+font-size: 36px;
+    @include media-query($on-laptop) {
+        font-size: 22px;
+    }
 }
 
 
