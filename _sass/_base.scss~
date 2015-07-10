@@ -8,8 +8,6 @@ dl, dd, ol, ul, figure {
     padding: 0;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
-    -moz-font-smoothing: antialiased !important;
-    font-smoothing: antialiased !important;
     font-feature-settings: "liga";
 }
 
