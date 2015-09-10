@@ -171,7 +171,11 @@
 }
 
 .page-heading {
-    font-size: 60px;
+    font-size: $base-font-size*1.6*1.6*1.6;
+    
+}
+.page-heading *{
+    text-align:center;
 }
 
 .post-list {
@@ -202,25 +206,27 @@
     margin-bottom: $spacing-unit;
     font-size: 60px;
 }
+.post-header *{
+    text-align: center
+}
 
 .post-title {
-    font-size: 60px;
+    font-size: $base-font-size*1.6*1.6*1.6;
     letter-spacing: -1px;
     line-height: 1;
 
     @include media-query($on-laptop) {
-        font-size: 36px;
+        font-size: 48px;
     }
 }
 
 .post-content {
     margin-bottom: $spacing-unit;
-    letter-spacing: 0.008rem;
      @include media-query($on-laptop) {
             font-size: 20px;
         }
     h2 {
-        font-size: 32px;
+        font-size: $base-font-size*1.6;
 
         @include media-query($on-laptop) {
             font-size: 28px;

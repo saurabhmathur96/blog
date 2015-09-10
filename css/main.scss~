@@ -6,16 +6,16 @@
 
 
 // Our variables
-$base-font-family: "Lato", Arial, sans-serif;
-$base-font-size:   16px;
-$small-font-size:  $base-font-size * 0.875;
+$base-font-family: "Crimson Text", serif;
+$base-font-size:   18px;
+$small-font-size:  14px;
 $base-line-height: 1.5;
 
 $header-font-family: "Montserrat", Arial, sans-serif;
 
 $spacing-unit:     30px;
 
-$text-color:       #111;
+$text-color:       #1F1F26;
 $background-color: #fdfdfd;
 $brand-color:      #2a7ae2;
 

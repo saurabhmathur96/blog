@@ -10,7 +10,7 @@ dl, dd, ol, ul, figure {
     -webkit-font-smoothing: antialiased !important;
     -moz-font-smoothing: antialiased !important;
     font-smoothing: antialiased !important;
-    font-feature-settings: "liga";
+    font-feature-settings: "liga", "kern";
 }
 
 
@@ -21,7 +21,7 @@ body {
     font-family: $base-font-family;
     font-size: $base-font-size;
     line-height: $base-line-height;
-    font-weight: 300;
+    font-weight: 400;
     color: $text-color;
     background-color: $background-color;
     -webkit-text-size-adjust: 100%;
@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6 {
 h1{
 font-size: 36px;
     @include media-query($on-laptop) {
-        font-size: 22px;
+        font-size: 28px;
     }
 }
 
