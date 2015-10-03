@@ -12,7 +12,7 @@ Academics portal.
 
 #The "conventional" way
 The conventional way is to right-click each hyper-link and save to a location.
-That is fine for one or two files but for it is really painful to manually downloading and rename each file.
+That is fine for one or two files but for it is really painful to manually download and rename each file.
 
 ( I forgot to mention, all files have a prefix like `FALLSEM2015-16_CP0270_15-Oct-2015_RM01`. This adds data regarding when it was uploaded etc. )
 
