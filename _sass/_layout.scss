@@ -206,6 +206,10 @@
 .post-header {
     margin-bottom: $spacing-unit;
     font-size: 60px;
+
+
+
+
 }
 .post-header *{
     text-align: center
@@ -223,6 +227,9 @@
 
 .post-content {
     margin-bottom: $spacing-unit;
+    
+
+    
      @include media-query($on-laptop) {
             font-size: 20px;
         }

@@ -3,7 +3,7 @@
  */
 .site-header {
     
-    
+    border-bottom: 1px solid $grey-color-light;
     min-height: 56px;
 
     // Positioning context for the mobile navigation icon
@@ -206,6 +206,15 @@
 .post-header {
     margin-bottom: $spacing-unit;
     font-size: 60px;
+
+    -webkit-animation: fade-in-down 0.6s;
+    animation: fade-in-down 0.6s;
+    -webkit-animation-delay: 0.2s;
+    animation-delay: 0.2s;
+
+
+
+
 }
 .post-header *{
     text-align: center
@@ -220,9 +229,17 @@
         font-size: 48px;
     }
 }
-
+.post-content *{
+    -webkit-animation: fade-in-down 0.9s;
+    animation: fade-in-down 0.9s;
+    -webkit-animation-delay: 0.1s;
+    animation-delay: 0.1s;
+    }
 .post-content {
     margin-bottom: $spacing-unit;
+    
+
+    
      @include media-query($on-laptop) {
             font-size: 20px;
         }
