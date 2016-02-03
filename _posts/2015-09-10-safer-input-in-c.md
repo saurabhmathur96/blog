@@ -1,12 +1,11 @@
 ---
 layout: post
 title:  "Safer input in C"
-excerpt: "A more robust method to read from standard input in C."
 date:   2015-09-10 20:24:00
 categories: jekyll
 ---
 
-#Why not to use scanf
+# Why not to use scanf
 `scanf` is the standard method to get structured, formatted input in C.  
 The problems with `scanf` are:
 
@@ -17,7 +16,7 @@ The problems with `scanf` are:
 
  [A more detailed explaination is on c-faq.com](http://c-faq.com/stdio/scanfprobs.html).
 
-#An alternative
+# An alternative
  A quick search on [stackoverflow](http://stackoverflow.com/questions/9278226/which-is-the-best-way-to-get-input-from-user-in-c) showed that using `fgets` to read strings is considered a good option.  
  To read `ints` and `floats` the `sscanf` function can be used. `sscanf` is a function used to take formatted "input" from strings.  
 
