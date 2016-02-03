@@ -6,7 +6,7 @@ date:   2015-07-07 18:44:43
 categories: jekyll
 ---
 
-#Hello, World !
+# Hello, World !
 
 Finally ! I have setup this blog using the awesome static site generator [Jekyll][jekyll]. Now I can blog like a *Hacker*.
 
