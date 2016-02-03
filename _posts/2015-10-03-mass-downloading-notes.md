@@ -1,6 +1,7 @@
 ---
 layout: post
 title:  "Mass downloading notes"
+excerpt: "A bash script that downloads slide decks from academics portal"
 date:   2015-10-03 11:25:00
 categories: jekyll
 ---
