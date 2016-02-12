@@ -1,19 +1,17 @@
 ---
 layout: default
 ---
-<div class="col-8-tablet push-2-tablet">
 
-  <header class="text-center">
-    <h1 class="title">{{ page.title }}</h1>
-    <hr>
-    <small>
-      {{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}
-    </small>
+<header >
+  <h1>{{ page.title }}</h1>
+  
+  <small>
+    {{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}
+  </small>
 
-  </header>
+</header>
 
-  <article class="post-content">
-    {{ content }}
-  </article>
+<article>
+  {{ content }}
+</article>
 
-</div>

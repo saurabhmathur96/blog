@@ -3,23 +3,19 @@ layout: default
 ---
 
 
-
-<div class="col-6-tablet push-3-tablet">
   <header>
-    <h1>&lt;Blog/&gt;</h1>
-    <small>by saurabh mathur</small>
+    <h1><code>&lt;Blog/&gt;</code></h1>
+    <p class="subtitle">by saurabh mathur</p>
   </header>
 
-<ul class="list-unstyled">
+<ul>
   {% for post in site.posts %}
   <li>
     <h2>
       {{ post.title }}
     </h2>
-    <small>{{ post.date | date: "%b %-d, %Y" }}</small>
-    <span class="right">
-      <a class="small" href="{{ post.url | prepend: site.baseurl }}">Read</a>
-    </span>
+    <small>{{ post.date | date: "%b %-d, %Y" }}</small> <br/>
+    <a href="{{ post.url | prepend: site.baseurl }}">Read</a>
   </li>
   {% endfor %}
 </ul>
