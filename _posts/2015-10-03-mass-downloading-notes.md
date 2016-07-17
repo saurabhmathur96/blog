@@ -2,7 +2,7 @@
 layout: post
 title:  "Mass downloading notes"
 date:   2015-10-03 11:25:00
-categories: jekyll
+categories: bash
 ---
 
 # Open book Exams

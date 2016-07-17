@@ -15,5 +15,7 @@ p.subtitle {
     line-height: 1;
 }
 
+code.has-jax {font: inherit; font-size: 100%; background: inherit; border: inherit;}
+
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import  "syntax-highlighting";

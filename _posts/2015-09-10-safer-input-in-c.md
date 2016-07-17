@@ -2,7 +2,7 @@
 layout: post
 title:  "Safer input in C"
 date:   2015-09-10 20:24:00
-categories: jekyll
+categories: C
 ---
 
 # Why not to use scanf
