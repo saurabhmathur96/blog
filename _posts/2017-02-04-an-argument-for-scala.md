@@ -120,5 +120,5 @@ your options when choosing an IDE are limited.
 
 These problems are likely to be mitigated in the near future. 
 
-In closing, I have come to realise that the short answer for the question "When should I use Scala ?"
-is when you are developing for the future.
+In closing, I have come to realise that the answer to the question "When should I use Scala ?"
+is - when you are developing for the future.
