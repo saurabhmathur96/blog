@@ -5,7 +5,7 @@ date:   2017-02-04
 categories: scala
 ---
 
-I gave a presentation on Scala as an assignment for in Open Source Programming class. While researching for 
+I gave a presentation on Scala as an assignment for my Open Source Programming class. While researching for 
 the presentation, I came across many interesting talks and articles about the language and its philosophy. 
 What follows is an attempt to condense that information as set of reasons to use Scala for a project.
 
