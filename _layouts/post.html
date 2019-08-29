@@ -1,37 +1,8 @@
 ---
 layout: default
 ---
+<h1>{{ page.title}}</h1>
+<p class="subtitle">{{ page.date | date: "%B %-d, %Y" }}</p>
 
-<header >
-  <h1>{{ page.title }}</h1>
-  
-  <small>
-    {{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}
-  </small>
+{{ content }}
 
-</header>
-
-<article>
-  {{ content }}
-</article>
-
-<script type="text/javascript" 
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
-<script>
-
-  MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-        inlineMath: [['$','$'], ['\\(','\\)']]
-      }
-    });
-
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for(i=0; i < all.length; i += 1) {
-            all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-    });
-</script>

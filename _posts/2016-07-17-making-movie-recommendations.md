@@ -10,8 +10,10 @@ I did my summer internship at Microsoft Technology Center, Bangalore. There, I
 worked on the problem of recommending movies. This post talks about how the 
 solution that I developed works.
 
-![Movie Similar to Cinderella](/blog/static/images/movie-similarity.png)
-Movies Similar to Cinderella
+{% maincolumn '/static/images/movie-similarity.png' 'A screenshot of the final app displaying movies similar to Cinderella' %}
+
+
+
 
 ## The Problem Statement
 
@@ -43,29 +45,71 @@ The GroupLens MovieLens 100k dataset consists of 1682 movies rated by 943 users.
 Each user has rated at least 20 movies, a total of 10,000 ratings.
 Ratings are positive integers from 1 to 5.
 
+<div class="table-wrapper">
 
-|Sno. |UserId|MovieId|Rating| Timestamp|
-|:----|:----:|:-----:|-----:|---------:|
-|0    |   196|    242|    3 | 881250949|
-|1    |   186|    302|    3 | 891717742|
-|2    |    22|    377|    1 | 878887116|
-|3    |   244|     51|    2 | 880606923|
-|4    |   166|    346|    1 | 886397596|
+<table>
+  <thead>
+    <tr>
+      <th >Sno.</th>
+      <th >UserId</th>
+      <th >MovieId</th>
+      <th >Rating</th>
+      <th >Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td >0</td>
+      <td >196</td>
+      <td >242</td>
+      <td >3</td>
+      <td >881250949</td>
+    </tr>
+    <tr>
+      <td >1</td>
+      <td >186</td>
+      <td >302</td>
+      <td >3</td>
+      <td >891717742</td>
+    </tr>
+    <tr>
+      <td >2</td>
+      <td >22</td>
+      <td >377</td>
+      <td >1</td>
+      <td >878887116</td>
+    </tr>
+    <tr>
+      <td >3</td>
+      <td >244</td>
+      <td >51</td>
+      <td >2</td>
+      <td >880606923</td>
+    </tr>
+    <tr>
+      <td >4</td>
+      <td >166</td>
+      <td >346</td>
+      <td >1</td>
+      <td >886397596</td>
+    </tr>
+  </tbody>
+</table>
 
-### Ratings distribution
+</div>
 
-![Movie Ratings Distribution](/blog/static/images/ratings-distribution.png)
 
-Movie Ratings Distribution
+{% marginfigure 'freq-dist'  '/static/images/ratings-distribution.png' 'The frequency distribution of the movie ratings data' %}
+
+
+
 
 
 ## The evaluation metric
 
 The accuracy of the predictions was measured by the Root Mean Squared Error(RMSE).
 
-$$
-    RMSE = \sqrt{ \frac{ \sum_{i=1}^{n} predicted_i - actual_i }{n} }
-$$
+{% math %}RMSE = \sqrt{ \frac{ \sum_{i=1}^{n} predicted_i - actual_i }{n} }{% endmath %}
 
 ## The solution
 
@@ -75,7 +119,7 @@ The ratings table was converted into a *movie by user* matrix of dimension (1682
 Since, not every user rated every movie, there were a lot of missing values. They were
 designated by a 0. 
 
-$$ \left [
+{% math %} \left [
         \begin{array}{ccccccc}
         
         5       & 0 & 0     & 0 & \dots  & 3\\
@@ -84,7 +128,7 @@ $$ \left [
         0       & 0 & 4 &      0 &  \dots &1\\
         
         \end{array}
-\right ] $$
+\right ] {% endmath %}
 
 
 As a result, more than 97 % of the matrix consists of zeros. So, to efficiently store 
@@ -100,9 +144,9 @@ Now, given the matrix representation, by computing distance based scores, we can
 
 Similarity is related to distance by :
 
-$$
+{% math %}
     similarity \propto \frac{1}{distance}
-$$
+{% endmath %}
 
 ### Similar Users
 
@@ -112,14 +156,14 @@ liked and have not been watched by the current user.
 Also, a reasonable way of predicting the current user's rating is by taking an average of
 the ratings of k - similar users weighted by their similarity to current user.
 
-$$
+{% math %}
     r_{um} = \frac{ \sum_{i=1}^{k} r_{im} \cdot s_{iu} } { \sum_{i=1}^{k} s_{iu} }
-$$
+{% endmath %}
 
 where,
 
-- $ r_{ij} $ is the rating of movie $ j $ by user $ i $.
-- $ s_{ij} $ is the similarity between users $ i $ and $ j $.
+- {% m %}r_{ij}{% em %} is the rating of movie {% m %}j{% em %} by user {% m %}i{% em %}.
+- {% m %}s_{ij}{% em %} is the similarity between users {% m %}i{% em %} and {% m %}j{% em %}.
 
 This method has the following shortcomings :
 
@@ -141,14 +185,14 @@ be shown along with the description of the movie.
 To make a rating prediction, we can take an average of k - similar movies that have been
 rated by the current user weighted by their similarity to the current movie.
 
-$$
+{% math %}
     r_{um} = \frac{ \sum_{i=1}^{k} r_{ui} \cdot s_{mi} } { \sum_{i=1}^{k} s_{mi} }
-$$
+{% endmath %}
 
 where,
 
-- $ r_{ij} $ is the rating of movie $ j $ by user $ i $.
-- $ s_{ij} $ is the similarity between movies $ i $ and $ j $.
+- {% m %}r_{ij}{% em %} is the rating of movie {% m %}j{% em %} by user {% m %}i{% em %}.
+- {% m %}s_{ij}{% em %} is the similarity between movies {% m %}i{% em %} and {% m %}j{% em %}.
 
 This approach is better as :
 
@@ -170,19 +214,19 @@ Following distance metrics are widely used and were considered :
 
 The most common way of finding distance between two data points.
 
-In two dimensions, distance between $ a(a_1, a_2) $ and $ b(b_1, b_2) $ ,
+In two dimensions, distance between {% m %}a(a_1, a_2){% em %} and {% m %}b(b_1, b_2){% em %} ,
 
-$$
+{% math %}
     euclidean \space distance = \sqrt{ (a_1 - b_1)^{2} + (a_2 - b_2)^{2} }
 
-$$
+{% endmath %}
 
-Generally, in n-dimensions, distance between $ a(a_1, \dots, a_n) $ and $ b(b_1, \dots, b_n) $,
+Generally, in n-dimensions, distance between {% m %}a(a_1, \dots, a_n){% em %} and {% m %}b(b_1, \dots, b_n){% em %},
 
-$$
+{% math %}
     euclidean \space distance = \sqrt{ \sum_{i=1}^{n} (a_i - b_i)^{2} }
 
-$$
+{% endmath %}
 
 This however does not work well in our case. This is because there are a 
 large number of missing ratings which are represented by a zero. The euclidean distance 
@@ -192,19 +236,19 @@ interprets the zero as a rating that is lower than 1.
 
 This is another common way of finding distance.
 
-In two dimensions, distance between $ a(a_1, a_2) $ and $ b(b_1, b_2) $ ,
+In two dimensions, distance between {% m %}a(a_1, a_2){% em %} and {% m %}b(b_1, b_2){% em %} ,
 
-$$
+{% math %}
     manhattan \space distance = \sqrt{  |a_1 - b_1| +  |a_2 - b_2| }
 
-$$
+{% endmath %}
 
-Generally, in n-dimensions, distance between $ a(a_1, \dots, a_n) $ and $ b(b_1, \dots, b_n) $,
+Generally, in n-dimensions, distance between {% m %}a(a_1, \dots, a_n){% em %} and {% m %}b(b_1, \dots, b_n){% em %},
 
-$$
+{% math %}
     manhattan \space distance = \sqrt{ \sum_{i=1}^{n} |a_i - b_i| }
 
-$$
+{% endmath %}
 
 Manhattan distance fails too, due to the same reason.
 
@@ -214,19 +258,19 @@ This metric basically finds the cosine of the angle between the lines joining
 the data points to the origin.
 
 
-In two dimensions, distance between $ a(a_1, a_2) $ and $ b(b_1, b_2) $ ,
+In two dimensions, distance between {% m %}a(a_1, a_2){% em %} and {% m %}b(b_1, b_2){% em %} ,
 
-$$
+{% math %}
     cosine \space distance = \frac{  (a_1 \cdot b_1) +  (a_2 \cdot b_2) } { \sqrt{ (a_1^2 + a_2^2) } \cdot \sqrt{ (b_1^2 + b_2^2) } }
 
-$$
+{% endmath %}
 
-Generally, in n-dimensions, distance between $ a(a_1, \dots, a_n) $ and $ b(b_1, \dots, b_n) $,
+Generally, in n-dimensions, distance between {% m %}a(a_1, \dots, a_n){% em %} and {% m %}b(b_1, \dots, b_n){% em %},
 
-$$
+{% math %}
     cosine \space distance = \frac{  \sum_{i=1}^{n} (a_i \cdot b_i)} { \sqrt{ (\sum_{i=1}^{n} a_i^2) } \cdot \sqrt{ (\sum_{i=1}^{n} b_i^2) } }
 
-$$
+{% endmath %}
 
 This cosine distance takes a different approach to the problem and relies on multiplication 
 instead of addition or subtraction. Thus, if either of the movies have 
@@ -234,10 +278,9 @@ not been rated by a given user that set of data points is discarded due to incom
 
 Cosine similarity can be defined as,
 
-$$
+{% math %}
     cosine\_similarity(a, b) = 1 - cosine\_distance(a, b)
-
-$$
+{% endmath %}
 
 
 ## Conclusion
@@ -246,8 +289,9 @@ In the implementation, I used the cosine similarity metric to find movies simila
 to improve discovery of movies. The metric was implented in python and deployed on Azure ML
 as a web service.
 
-![Movie Similar to Cinderella](/blog/static/images/movie-similarity.png)
-Movies Similar to Cinderella
+{% fullwidth  '/static/images/movie-similarity.png' 'Movies Similar to Cinderella' %}
+
+
 
 For the movie Cinderella, the movie simililarity service predicts 
 
@@ -255,7 +299,6 @@ For the movie Cinderella, the movie simililarity service predicts
 - Aladdin
 - Snow White and the seven dwarfs
 - Sound of music
-- and so on
 
 as similar movies. This seems to works pretty well - even better than a 
 genre match for surfacing movies.
