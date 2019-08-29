@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>The perils of Facial Recognition</title>
+  <meta name="description" content="On June 28, 2019, the National Crime Records Bureau (NCRB) called for bids for the implementation of a Facial Recognition SystemThe RFP is on the NCRB websit...">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+    <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <link rel="stylesheet" type="text/css" href="/blog/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/blog/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="http://saurabhmathur96.github.io/blog/blog/machine-learning/2019/08/29/perils-of-facial-recognition.html">
+
+  <link rel="alternate" type="application/rss+xml" title="Saurabh's Blog" href="http://saurabhmathur96.github.io/blog/blog/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	
+		
+		    
+		      <a href="/blog/">Blog</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>The perils of Facial Recognition</h1>
+<p class="subtitle">August 29, 2019</p>
+
+<p>On June 28, 2019, the National Crime Records Bureau (NCRB) called for bids for the implementation of a Facial Recognition System
+<label for="ad" class="margin-toggle sidenote-number"></label><input type="checkbox" id="ad" class="margin-toggle" /><span class="sidenote">The RFP is on <a href="http://web.archive.org/web/20190818023954/http://ncrb.gov.in/TENDERS/AFRS/RFP_NAFRS.pdf">the NCRB website</a> </span>.
+ This would allow the police to identify people by clicking a picture or pulling up CCTV footage and automatically matching them against a database of faces. This is a <em>terrible</em> idea and here’s why.</p>
+
+<h2 id="bias">Bias</h2>
+
+<p>Technology has a profound impact on our lives. As John Culkin famously said:</p>
+<blockquote>
+  <p>“We shape our tools and thereafter our tools shape us.”</p>
+</blockquote>
+
+<p>Take hip hop for example - a genre invented in house parties in the Bronx has now become a medium for dissent across the world thanks to Spotify and YouTube. The same streaming technology also brought about a trend of shorter tracks as the artists are now paid per stream<label for="hiphop" class="margin-toggle sidenote-number"></label><input type="checkbox" id="hiphop" class="margin-toggle" /><span class="sidenote">"Hip Hop and Streaming", Patriot Act with Hasan Minhaj, Volume 2 Episode 5  </span>.</p>
+
+<p>Similarly, when people with conscious and unconscious biases (See racism, sexism, etc.) design Facial Recognition Systems, these biases get transferred to the systems. And when such a system makes mistakes due to these biases, it results in discrimination on a large scale.</p>
+
+<p>Further, the biases get reinforced by <a href="https://en.wikipedia.org/wiki/Automation_bias">Automation bias</a><label for="automation" class="margin-toggle sidenote-number"></label><input type="checkbox" id="automation" class="margin-toggle" /><span class="sidenote">People trust machine-made decisions more than they should. </span> and <a href="https://en.wikipedia.org/wiki/Confirmation_bias">Confirmation bias</a><label for="automation" class="margin-toggle sidenote-number"></label><input type="checkbox" id="automation" class="margin-toggle" /><span class="sidenote">The machine is correct if it agrees with me. </span> . So, even if the AI doesn’t make the final decision, the judgment of human-experts does get colored by it. To make problems worse, even the testing datasets are biased. In all the hype around AI, we <em>kind of forgot</em> to check if our standard testing datasets represented the real world. So, the cycle continued silently. Until recently that is.</p>
+
+<p>In 2018, <a href="http://proceedings.mlr.press/v81/buolamwini18a.html">Joy Buolamwini and Timnit Gebru</a> found that state-of-the-art Facial Recognition engines from giants like Amazon were biased. <label for="1" class="margin-toggle">⊕</label><input type="checkbox" id="1" class="margin-toggle" /><span class="marginnote"><img class="fullwidth" src="/blog/static/images/gender-shades.png" /><br />From the <a href="http://gendershades.org/overview.html">Gender Shades project</a></span> These off-the-shelf engines were 30 times more likely to misidentify dark-skinned women as compared to light-skinned men.</p>
+
+<p>In a test last year, Amazon’s <em>Rekognition</em> service <a href="https://www.theguardian.com/technology/2018/jul/26/amazon-facial-rekognition-congress-mugshots-aclu">falsely identified 28 US congresspeople as criminals</a>.
+78 concerned scientists wrote <a href="https://medium.com/@bu64dcjrytwitb8/on-recent-research-auditing-commercial-facial-analysis-technology-19148bda1832">this open letter</a> to Amazon about the dangers of selling this technology to law enforcement.</p>
+
+<h2 id="transparency">Transparency</h2>
+
+<p>Not only is facial recognition biased, but it is hard to fix. A lot of the recent progress in AI has been due to deep learning. With deep learning, the AI agent learns patterns directly from large amounts of data. In the case of facial recognition, for example, it would consider things like facial hair and texture of the skin. While this reduces the need for human-experts, it makes interpretability<label for="interpret" class="margin-toggle sidenote-number"></label><input type="checkbox" id="interpret" class="margin-toggle" /><span class="sidenote">Why did the agent make a particular decision? </span> and feedback<label for="feedback" class="margin-toggle sidenote-number"></label><input type="checkbox" id="feedback" class="margin-toggle" /><span class="sidenote">Correcting wrong decisions </span> hard.</p>
+
+<p>Ali Rahimi, <a href="http://www.argmin.net/2017/12/05/kitchen-sinks/">in his talk at NIPS 2017</a>, said:</p>
+<blockquote>
+  <p>We say things like “machine learning is the new electricity”. I’d like to offer an alternative metaphor: machine learning has become alchemy.</p>
+</blockquote>
+
+<p>And then there are adversarial attacks. Facial Recognition Systems, just like any other piece of software, can be attacked. Except, in the case of facial recognition, <a href="https://dl.acm.org/citation.cfm?id=2978392">the attack can be worn</a>. Not only can you evade detection but you can also impersonate someone just by wearing a pair of glasses with a specific pattern.</p>
+
+<p><a href="https://equalais.media.mit.edu/">equalAIs</a> is a project by the MIT Media lab demonstrates the fragility of state-of-the-art Facial Recognition Systems. It makes a very small change to a picture such that the facial recognition system fails.</p>
+
+<h2 id="privacy">Privacy</h2>
+
+<p>On 23rd August 2017, the Supreme Court of India unanimously recognized privacy as a fundamental right guaranteed by the Constitution after Justice K S Puttaswamy, a retired judge of the High Court, filed a writ petition in the Supreme Court. Mass surveillance using facial recognition infringes this Right to Privacy.</p>
+
+<p>Power corrupts and absolute power corrupts absolutely. In the modern context, information provides the corrupting absolute power. We’ve seen this happen throughout history whether it was <a href="https://www.jewishvirtuallibrary.org/ibm-and-quot-death-s-calculator-quot-2">the IBM powered German census</a> or <a href="https://wiser.wits.ac.za/content/book-life-south-african-population-register-and-invention-racial-descent-1950%e2%80%931980-11640">the South African Book of Life</a>. The Chinese government has large-scale mass surveillance across the country. There have been reports about these surveillance systems being used to <a href="https://www.nytimes.com/2019/04/14/technology/china-surveillance-artificial-intelligence-racial-profiling.html">track-down minorities and crush dissent</a>.</p>
+
+<p>Governments across the world have justified this invasion of privacy and weaponization of data with broad terms like greater good and public interest.  In the Economic Survey of India 2018-19, the Ministry of Finance said that the elite’s preference of privacy should not be imposed on the poor, who care for a better quality of living the most - which is <em>literally</em> the opposite of what the supreme court ruled in the Right to Privacy case! As Puttaswamy puts it:</p>
+<blockquote>
+  <p>“The refrain that the poor need no civil and political rights and are concerned only with economic well being has been utilised through history to wreak the most egregious violations of human rights.”</p>
+</blockquote>
+
+<h2 id="the-indian-government">The Indian Government</h2>
+
+<p>Surely if data can be weaponized like this, there would be laws regulating its usage. But there are none. In fact, the data protection bill which was drafted on the Supreme Court’s directions last year has still not been passed<label for="privacy" class="margin-toggle sidenote-number"></label><input type="checkbox" id="privacy" class="margin-toggle" /><span class="sidenote">The was part of the Right to Privacy case. This is the same case in which the government unsuccessfully argued that the people of India do not have a right to their own body.  </span>.</p>
+
+<p>Further, the Minister for IT, R S Prasad refused to release the <em>public</em> consultations held in the drafting of the personal data protection bill<label for="meity" class="margin-toggle sidenote-number"></label><input type="checkbox" id="meity" class="margin-toggle" /><span class="sidenote">Response to Unstarred Question #3685 on 25th July in the Rajya Sabha. </span>. In contrast, the US House of Representatives invited experts to testify in Congress for over three hours and live-streamed it on YouTube.  The full video of the live-stream from 22nd May 2019 is available <a href="https://www.youtube.com/watch?v=jLmzEFkbNsg">here</a> and the specific questions by Congresswoman Alexandria Ocasio-Cortez are available <a href="https://www.youtube.com/watch?v=pxZk6IQxaLY">here</a>.</p>
+
+<p>The Indian Government’s disregard for personal privacy and misuse of data is not just an abstract concept - it is already happening. The Minister of Road Transport and Highways, Nitin Gadkari said that ministry has been selling vehicle registration and driving license data of Indian citizens without consent. <label for="mrth" class="margin-toggle sidenote-number"></label><input type="checkbox" id="mrth" class="margin-toggle" /><span class="sidenote">Response to Unstarred Question #1698 on 8th July in the Rajya Sabha. The government has provided access to 87 private and 32 government entities, earning Rs. 65 crore. </span></p>
+
+<p>The general lack of government accountability only makes it worse. The state of accountability is so bad that NCRB, the government agency that is having a Facial Recognition System built, <a href="https://www.thehindu.com/news/national/ncrb-report-centre-blames-bengal-bihar/article28128233.ece">has not published its annual report after 2016</a>.</p>
+
+<h2 id="the-solution">The Solution</h2>
+
+<p>In their 172 page RFC, the NCRB failed to address even a single one of these issues, and therein lies the problem. Had there been public consultations, experts would have pointed out these flaws. Given the fast rate of technological progress, public consultations are vital to ensure that the people’s interests are represented.</p>
+
+<p>As far as Facial Recognition is concerned, the technology is far from perfect and its use by law enforcement has been banned in many places around the world. If a similar ban is not enacted in India, there should at least be laws defining precisely when and how the technology will be used.</p>
+
+
+
+    </article>
+    <span class="print-footer">The perils of Facial Recognition - August 29, 2019 - Saurabh Mathur</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/mathursaurabh96"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/saurabhmathur96"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2019 &nbsp;&nbsp;SAURABH MATHUR</span></br> <br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for  </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+
+
+<script>
+  MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$'], ['\\(','\\)']]
+      }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+</html>

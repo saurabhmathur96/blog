@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Safer input in C</title>
+  <meta name="description" content="Why not to use scanfscanf is the standard method to get structured, formatted input in C.The problems with scanf are:">
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+    <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <link rel="stylesheet" type="text/css" href="/blog/css/tufte.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/blog/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="http://saurabhmathur96.github.io/blog/blog/c/2015/09/10/safer-input-in-c.html">
+
+  <link rel="alternate" type="application/rss+xml" title="Saurabh's Blog" href="http://saurabhmathur96.github.io/blog/blog/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	
+		
+		    
+		      <a href="/blog/">Blog</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>Safer input in C</h1>
+<p class="subtitle">September 10, 2015</p>
+
+<h1 id="why-not-to-use-scanf">Why not to use scanf</h1>
+<p><code class="highlighter-rouge">scanf</code> is the standard method to get structured, formatted input in C.<br />
+The problems with <code class="highlighter-rouge">scanf</code> are:</p>
+
+<ul>
+  <li>While it is extremely powerful, it is not very robust when it comes to error recovery. It does tell you if it has succeeded or failed (through the return value) but basically, that’s all.</li>
+  <li>Reading strings with <code class="highlighter-rouge">%s</code> has the same vulnerability as <code class="highlighter-rouge">gets</code> - it does not check the size of your string, which may be longer than the input causing overflow.</li>
+  <li>It does not ignore whitespace. This means, that newlines are treated as characters. This is a problem when you are reading single <code class="highlighter-rouge">chars</code>. If the user enters a single <code class="highlighter-rouge">char</code> and presses enter, a newline character (<code class="highlighter-rouge">'\n'</code>) is also added to the buffer. Now when you try to read another<code class="highlighter-rouge">char</code>, the <code class="highlighter-rouge">'\n'</code> is read.</li>
+</ul>
+
+<p><a href="http://c-faq.com/stdio/scanfprobs.html">A more detailed explaination is on c-faq.com</a>.</p>
+
+<h1 id="an-alternative">An alternative</h1>
+<p>A quick search on <a href="http://stackoverflow.com/questions/9278226/which-is-the-best-way-to-get-input-from-user-in-c">stackoverflow</a> showed that using <code class="highlighter-rouge">fgets</code> to read strings is considered a good option.<br />
+ To read <code class="highlighter-rouge">ints</code> and <code class="highlighter-rouge">floats</code> the <code class="highlighter-rouge">sscanf</code> function can be used. <code class="highlighter-rouge">sscanf</code> is a function used to take formatted “input” from strings.</p>
+
+<p><code class="highlighter-rouge">fgets</code> has another quirk - it reads the <code class="highlighter-rouge">'\n'</code> into the string too. This can be resolved by checking the last character.
+ Here’s how I implemented a <code class="highlighter-rouge">read_line</code> function that reads strings of given size thus avoiding overflow.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">read_line</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">line</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">fgets</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+
+    <span class="kt">int</span> <span class="n">length</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">'\n'</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">line</span><span class="p">[</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="sc">'\0'</span><span class="p">;</span>
+        <span class="n">length</span><span class="o">--</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">length</span><span class="p">;</span>
+<span class="p">}</span>
+ </code></pre></figure>
+
+<p>This function can be used to implement a <code class="highlighter-rouge">read_int</code> function that asks the user to re-enter the input if the input is invalid.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int</span> <span class="nf">read_int</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">char</span> <span class="n">line</span><span class="p">[</span><span class="mi">256</span><span class="p">];</span>
+    <span class="n">read_line</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="k">sizeof</span> <span class="n">line</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">sscanf</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s">"%d"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\"</span><span class="s">%s</span><span class="se">\"</span><span class="s"> is not an integer. Retry: "</span><span class="p">,</span> <span class="n">line</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">read_int</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+
+
+
+    </article>
+    <span class="print-footer">Safer input in C - September 10, 2015 - Saurabh Mathur</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+    <li><a href="mailto:hate@spam.net"><span class="icon-mail"></span></a></li>    
+    
+      <li>
+        <a href="//www.twitter.com/mathursaurabh96"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/saurabhmathur96"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2019 &nbsp;&nbsp;SAURABH MATHUR</span></br> <br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for  </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+  </body>
+
+
+<script>
+  MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$'], ['\\(','\\)']]
+      }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+</html>
