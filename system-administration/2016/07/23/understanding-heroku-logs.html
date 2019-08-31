@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>Understanding Heroku Logs</title>
+  <meta name="description" content="I’ve been using heroku for hosting my apps for free.However, free accounts on heroku are not provided with metrics."/>
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <link rel="stylesheet" type="text/css" href="/blog/css/tufte.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="/blog/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="http://saurabhmathur96.github.io/blog/blog/system-administration/2016/07/23/understanding-heroku-logs.html" />
+
+  <link rel="alternate" type="application/rss+xml" title="Saurabh's Blog" href="http://saurabhmathur96.github.io/blog/blog/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	
+		
+		    
+		      <a href="/blog/">Blog</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>Understanding Heroku Logs</h1>
+<p class="subtitle">July 23, 2016</p>
+
+<p>I’ve been using heroku for hosting my apps for free.
+However, free accounts on heroku are not provided with metrics.</p>
+
+<p>Heroku logs provide a lot of information about about the app,
+ but searching them even with <code class="highlighter-rouge">grep</code> seems very tedious.
+This post describes my attempt to parsing and 
+visualizing the server logs to make performance monitoring easier.</p>
+
+<h2 id="the-log-structure">The Log Structure</h2>
+
+<p>While the <code class="highlighter-rouge">heroku logs</code> command gives a collection of different types of logs, the following structure is 
+common among them :</p>
+
+<ul>
+  <li>Each new log is on a new line and has space separated elements.</li>
+  <li>The first element is an ISO 8601 timestamp with nanosecond precision.</li>
+  <li>The second element is the source process of the log.</li>
+  <li>Everything after the second element is the content of the log.</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+[timestamp] [source] [key1]=[value1] ...
+</code></p>
+
+<p>On the basis of the content of the log, it can be classified into the following major categories :</p>
+
+<ul>
+  <li>Log about an incoming request. It contains the HTTP Verb,
+ the request URL and the time taken by the server to send a response in milliseconds</li>
+  <li>Log about memory consumtion of the app. Information about swap and cache use,
+ total memory use and number of pages read and written.</li>
+  <li>Log about average load. Load averages at 1 minute, 5 minutes and 15 minutes.</li>
+  <li>Miscellaneous Log. Logs from the app etc.</li>
+</ul>
+
+<h2 id="parsing">Parsing</h2>
+
+<p>Next I got to parsing. Following is the python 2.7 script I used to parse the logs and convert 
+them to json.</p>
+
+<p>Here, I used the <code class="highlighter-rouge">shlex</code> module which makes it very convinient to read quoted strings.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c1">#!/usr/bin/env python
+</span><span class="kn">import</span> <span class="nn">sys</span><span class="p">,</span> <span class="n">json</span><span class="p">,</span> <span class="n">shlex</span>
+
+<span class="n">InFileName</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">OutFileName</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">SourceProcess</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="n">parsedData</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">InFileName</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">source</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">SourceProcess</span><span class="p">)</span> <span class="ow">and</span> <span class="s">'='</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="s">'memory'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+
+      <span class="c1"># split on space preserving quoted substrings
+</span>      <span class="n">tokens</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+      <span class="c1"># ["key1=value1","key2=value2"] to {key1: value1, key2: value2}
+</span>      <span class="n">pairs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span><span class="nb">tuple</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'='</span><span class="p">))</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">:]])</span> 
+
+      <span class="n">pairs</span><span class="p">[</span><span class="s">'timestamp'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+      
+      <span class="n">parsedData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pairs</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">OutFileName</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+  <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">parsedData</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></code></pre></figure>
+
+<h2 id="visualisation">Visualisation</h2>
+
+<p>The json generated by the parsing script can be loaded directly as a pandas DataFrame.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">memory_cache</th>
+      <th style="text-align: center">memory_pgpgin</th>
+      <th style="text-align: center">memory_pgpgout</th>
+      <th style="text-align: center">memory_quota</th>
+      <th style="text-align: center">memory_rss</th>
+      <th style="text-align: center">memory_swap</th>
+      <th style="text-align: right">memory_total</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">0.00MB</td>
+      <td style="text-align: center">1332855pages</td>
+      <td style="text-align: center">1331345pages</td>
+      <td style="text-align: center">512.00MB</td>
+      <td style="text-align: center">153.61MB</td>
+      <td style="text-align: center">4.70MB</td>
+      <td style="text-align: right">158.31MB</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Using matplotlib and seaborn, I was able to generate the following visualizations.</p>
+
+<p>They can be interpreted as per the descriptions on heroku: <a href="https://devcenter.heroku.com/articles/metrics">https://devcenter.heroku.com/articles/metrics</a></p>
+
+<p>Also, using <code class="highlighter-rouge">plt.gcf().autofmt_xdate()</code> when plotting time series data makes the time readable.</p>
+
+<h3 id="total-memory-consumed-over-time">Total memory consumed over time</h3>
+<p><img src="/blog/static/images/total-memory.png" alt="Total memory consumed over time" /></p>
+
+<h3 id="swap-memory-usage-over-time">Swap Memory usage over time</h3>
+<p><img src="/blog/static/images/swap.png" alt="Swap Memory usage over time" /></p>
+
+<h3 id="cache-memory-usage-over-time">Cache Memory usage over time</h3>
+<p><img src="/blog/static/images/cache.png" alt="Cache Memory usage over time" /></p>
+
+<h3 id="pages-read-over-time">Pages read over time</h3>
+<p><img src="/blog/static/images/pages-read.png" alt="Pages read over time" /></p>
+
+<h3 id="pages-written-over-time">Pages written over time</h3>
+<p><img src="/blog/static/images/pages-written.png" alt="Pages written over time" /></p>
+
+
+
+    </article>
+    <span class="print-footer">Understanding Heroku Logs - July 23, 2016 - Saurabh Mathur</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+     
+    
+      <li>
+        <a href="//www.twitter.com/mathursaurabh96"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/saurabhmathur96"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2019 &nbsp;&nbsp;SAURABH MATHUR</span><br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for  </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+
+    <script>
+      MathJax.Hub.Config({
+          tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$'], ['\\(','\\)']]
+          }
+        });
+        MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+        });
+    </script>
+  </body>
+
+
+
+</html>

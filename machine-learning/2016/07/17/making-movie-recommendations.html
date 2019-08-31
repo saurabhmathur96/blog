@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>Making movie recommendations</title>
+  <meta name="description" content="I did my summer internship at Microsoft Technology Center, Bangalore. There, I worked on the problem of recommending movies. This post talks about how the so..."/>
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <link rel="stylesheet" type="text/css" href="/blog/css/tufte.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="/blog/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="http://saurabhmathur96.github.io/blog/blog/machine-learning/2016/07/17/making-movie-recommendations.html" />
+
+  <link rel="alternate" type="application/rss+xml" title="Saurabh's Blog" href="http://saurabhmathur96.github.io/blog/blog/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	
+		
+		    
+		      <a href="/blog/">Blog</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>Making movie recommendations</h1>
+<p class="subtitle">July 17, 2016</p>
+
+<p>I did my summer internship at Microsoft Technology Center, Bangalore. There, I 
+worked on the problem of recommending movies. This post talks about how the 
+solution that I developed works.</p>
+
+<figure><figcaption>A screenshot of the final app displaying movies similar to Cinderella</figcaption><img src="/blog//static/images/movie-similarity.png" /></figure>
+
+<h2 id="the-problem-statement">The Problem Statement</h2>
+
+<p>Given a set of user ratings for a given set of movies, predict the rating of 
+a user for a movie.</p>
+
+<p>The problem has three cases:</p>
+
+<ul>
+  <li>Existing user, existing movie</li>
+  <li>New user, existing movie</li>
+  <li>Existing user, new movie</li>
+</ul>
+
+<h2 id="types-of-recommender-systems">Types of Recommender Systems</h2>
+
+<p>By the type of data, Recommender Systems can be classified into two types depending on the 
+type of data that they use. They are :</p>
+
+<ul>
+  <li>Explicit : votes, ratings and reviews.</li>
+  <li>Implicit : the user isn’t asked whether they like an item or not. Instead,
+   their behaviour is observed. This includes clicks, items added to cart,
+   items bought etc.</li>
+</ul>
+
+<p>I worked on Explicit Movie Rating Data from GroupLens. 
+The solution has been tested on the same.</p>
+
+<h2 id="the-dataset">The Dataset</h2>
+
+<p>The GroupLens MovieLens 100k dataset consists of 1682 movies rated by 943 users. 
+Each user has rated at least 20 movies, a total of 10,000 ratings.
+Ratings are positive integers from 1 to 5.</p>
+
+<div class="table-wrapper">
+
+<table>
+  <thead>
+    <tr>
+      <th>Sno.</th>
+      <th>UserId</th>
+      <th>MovieId</th>
+      <th>Rating</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>196</td>
+      <td>242</td>
+      <td>3</td>
+      <td>881250949</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>186</td>
+      <td>302</td>
+      <td>3</td>
+      <td>891717742</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>22</td>
+      <td>377</td>
+      <td>1</td>
+      <td>878887116</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>244</td>
+      <td>51</td>
+      <td>2</td>
+      <td>880606923</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>166</td>
+      <td>346</td>
+      <td>1</td>
+      <td>886397596</td>
+    </tr>
+  </tbody>
+</table>
+
+</div>
+
+<p><label for="freq-dist" class="margin-toggle">⊕</label><input type="checkbox" id="freq-dist" class="margin-toggle" /><span class="marginnote"><img class="fullwidth" src="/blog//static/images/ratings-distribution.png" /><br />The frequency distribution of the movie ratings data</span></p>
+
+<h2 id="the-evaluation-metric">The evaluation metric</h2>
+
+<p>The accuracy of the predictions was measured by the Root Mean Squared Error(RMSE).</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">RMSE = \sqrt{ \frac{ \sum_{i=1}^{n} predicted_i - actual_i }{n} }</script></div>
+
+<h2 id="the-solution">The solution</h2>
+
+<h3 id="preprocessing">Preprocessing</h3>
+
+<p>The ratings table was converted into a <em>movie by user</em> matrix of dimension (1682, 943).
+Since, not every user rated every movie, there were a lot of missing values. They were
+designated by a 0.</p>
+
+<div class="mathblock"><script type="math/tex; mode=display"> \left [
+        \begin{array}{ccccccc}
+        
+        5       & 0 & 0     & 0 & \dots  & 3\\
+        0       & 2 & 0     & 3 & \dots  & 0\\
+        \vdots  &  \vdots & \vdots & \vdots  & \ddots & \vdots      & \\
+        0       & 0 & 4 &      0 &  \dots &1\\
+        
+        \end{array}
+\right ] </script></div>
+
+<p>As a result, more than 97 % of the matrix consists of zeros. So, to efficiently store 
+the matrix, a sparse representation was used.</p>
+
+<h3 id="predicting-movie-ratings">Predicting Movie Ratings</h3>
+
+<p>Now, given the matrix representation, by computing distance based scores, we can find :</p>
+
+<ul>
+  <li>Similar Users</li>
+  <li>Similar Movies</li>
+</ul>
+
+<p>Similarity is related to distance by :</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    similarity \propto \frac{1}{distance}
+</script></div>
+
+<h3 id="similar-users">Similar Users</h3>
+
+<p>If we can find users similar to the current one, we can recommend movies that the similar users
+liked and have not been watched by the current user.</p>
+
+<p>Also, a reasonable way of predicting the current user’s rating is by taking an average of
+the ratings of k - similar users weighted by their similarity to current user.</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    r_{um} = \frac{ \sum_{i=1}^{k} r_{im} \cdot s_{iu} } { \sum_{i=1}^{k} s_{iu} }
+</script></div>
+
+<p>where,</p>
+
+<ul>
+  <li><span>​<script type="math/tex">r_{ij}</script></span> is the rating of movie <span>​<script type="math/tex">j</script></span> by user <span>​<script type="math/tex">i</script></span>.</li>
+  <li><span>​<script type="math/tex">s_{ij}</script></span> is the similarity between users <span>​<script type="math/tex">i</script></span> and <span>​<script type="math/tex">j</script></span>.</li>
+</ul>
+
+<p>This method has the following shortcomings :</p>
+
+<ul>
+  <li>The number of users is much larger than the number of movies in a real-life dataset.
+  Thus, the number of computations of user-user similarity becomes infeasible.</li>
+  <li>Since the average user does not rate a lot of movies, the most similar users might still
+  have a much different taste in movies.</li>
+  <li>User preferences are continuously changing. Thus a 10 year old rating might not
+  still be relevant.</li>
+</ul>
+
+<h3 id="similar-movies">Similar Movies</h3>
+
+<p>To overcome the shortcomings of user-user similarity based predictions, movie-movie similarity is
+used.</p>
+
+<p>Here, the same similarity metric is used to compute similar movies. These similar movies can 
+be shown along with the description of the movie.</p>
+
+<p>To make a rating prediction, we can take an average of k - similar movies that have been
+rated by the current user weighted by their similarity to the current movie.</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    r_{um} = \frac{ \sum_{i=1}^{k} r_{ui} \cdot s_{mi} } { \sum_{i=1}^{k} s_{mi} }
+</script></div>
+
+<p>where,</p>
+
+<ul>
+  <li><span>​<script type="math/tex">r_{ij}</script></span> is the rating of movie <span>​<script type="math/tex">j</script></span> by user <span>​<script type="math/tex">i</script></span>.</li>
+  <li><span>​<script type="math/tex">s_{ij}</script></span> is the similarity between movies <span>​<script type="math/tex">i</script></span> and <span>​<script type="math/tex">j</script></span>.</li>
+</ul>
+
+<p>This approach is better as :</p>
+
+<ul>
+  <li>The number of movies is generally less than the total number of users. Hence, the computations
+  are less.</li>
+  <li>While user preferences evolve over time, the movie similarity derived from their ratings,
+  result in a stable movie to movie similarity score. Hence, the movie similarities for existing movies
+   can be pre-computed and saved.</li>
+</ul>
+
+<h3 id="choosing-a-similarity-metric">Choosing a similarity metric</h3>
+
+<p>Following distance metrics are widely used and were considered :</p>
+
+<ul>
+  <li>Euclidean Distance</li>
+  <li>Manhattan Distance</li>
+  <li>Cosine Distance</li>
+</ul>
+
+<h3 id="euclidean-distance">Euclidean Distance</h3>
+
+<p>The most common way of finding distance between two data points.</p>
+
+<p>In two dimensions, distance between <span>​<script type="math/tex">a(a_1, a_2)</script></span> and <span>​<script type="math/tex">b(b_1, b_2)</script></span> ,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    euclidean \space distance = \sqrt{ (a_1 - b_1)^{2} + (a_2 - b_2)^{2} }
+
+</script></div>
+
+<p>Generally, in n-dimensions, distance between <span>​<script type="math/tex">a(a_1, \dots, a_n)</script></span> and <span>​<script type="math/tex">b(b_1, \dots, b_n)</script></span>,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    euclidean \space distance = \sqrt{ \sum_{i=1}^{n} (a_i - b_i)^{2} }
+
+</script></div>
+
+<p>This however does not work well in our case. This is because there are a 
+large number of missing ratings which are represented by a zero. The euclidean distance 
+interprets the zero as a rating that is lower than 1.</p>
+
+<h3 id="manhattan-distance">Manhattan Distance</h3>
+
+<p>This is another common way of finding distance.</p>
+
+<p>In two dimensions, distance between <span>​<script type="math/tex">a(a_1, a_2)</script></span> and <span>​<script type="math/tex">b(b_1, b_2)</script></span> ,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    manhattan \space distance = \sqrt{  |a_1 - b_1| +  |a_2 - b_2| }
+
+</script></div>
+
+<p>Generally, in n-dimensions, distance between <span>​<script type="math/tex">a(a_1, \dots, a_n)</script></span> and <span>​<script type="math/tex">b(b_1, \dots, b_n)</script></span>,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    manhattan \space distance = \sqrt{ \sum_{i=1}^{n} |a_i - b_i| }
+
+</script></div>
+
+<p>Manhattan distance fails too, due to the same reason.</p>
+
+<h3 id="cosine-distance">Cosine Distance</h3>
+
+<p>This metric basically finds the cosine of the angle between the lines joining 
+the data points to the origin.</p>
+
+<p>In two dimensions, distance between <span>​<script type="math/tex">a(a_1, a_2)</script></span> and <span>​<script type="math/tex">b(b_1, b_2)</script></span> ,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    cosine \space distance = \frac{  (a_1 \cdot b_1) +  (a_2 \cdot b_2) } { \sqrt{ (a_1^2 + a_2^2) } \cdot \sqrt{ (b_1^2 + b_2^2) } }
+
+</script></div>
+
+<p>Generally, in n-dimensions, distance between <span>​<script type="math/tex">a(a_1, \dots, a_n)</script></span> and <span>​<script type="math/tex">b(b_1, \dots, b_n)</script></span>,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    cosine \space distance = \frac{  \sum_{i=1}^{n} (a_i \cdot b_i)} { \sqrt{ (\sum_{i=1}^{n} a_i^2) } \cdot \sqrt{ (\sum_{i=1}^{n} b_i^2) } }
+
+</script></div>
+
+<p>This cosine distance takes a different approach to the problem and relies on multiplication 
+instead of addition or subtraction. Thus, if either of the movies have 
+not been rated by a given user that set of data points is discarded due to incompleteness.</p>
+
+<p>Cosine similarity can be defined as,</p>
+
+<div class="mathblock"><script type="math/tex; mode=display">
+    cosine\_similarity(a, b) = 1 - cosine\_distance(a, b)
+</script></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In the implementation, I used the cosine similarity metric to find movies similar to a given movie 
+to improve discovery of movies. The metric was implented in python and deployed on Azure ML
+as a web service.</p>
+
+<figure class="fullwidth"><img src="/blog//static/images/movie-similarity.png" /><figcaption>Movies Similar to Cinderella</figcaption></figure>
+
+<p>For the movie Cinderella, the movie simililarity service predicts</p>
+
+<ul>
+  <li>The Lion King</li>
+  <li>Aladdin</li>
+  <li>Snow White and the seven dwarfs</li>
+  <li>Sound of music</li>
+</ul>
+
+<p>as similar movies. This seems to works pretty well - even better than a 
+genre match for surfacing movies.</p>
+
+<p>The ratings predicted by this method gives an RMSE of 1.05 which, however, is not good enough.</p>
+
+
+
+    </article>
+    <span class="print-footer">Making movie recommendations - July 17, 2016 - Saurabh Mathur</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+     
+    
+      <li>
+        <a href="//www.twitter.com/mathursaurabh96"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/saurabhmathur96"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2019 &nbsp;&nbsp;SAURABH MATHUR</span><br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for  </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+
+    <script>
+      MathJax.Hub.Config({
+          tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$'], ['\\(','\\)']]
+          }
+        });
+        MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+        });
+    </script>
+  </body>
+
+
+
+</html>

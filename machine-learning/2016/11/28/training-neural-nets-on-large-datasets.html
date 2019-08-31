@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8"/>
+  <link rel="shortcut icon" href="#" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>Lessons learned from training neural nets on large datasets</title>
+  <meta name="description" content="This semester I have been trying to understand deep learning. Along the way I tried to implement some of the algorithmsand use them to classify images."/>
+
+  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
+  <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
+  
+  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+  <link rel="stylesheet" type="text/css" href="/blog/css/tufte.css" />
+  <!-- <link rel="stylesheet" type="text/css" href="/blog/css/print.css" media="print"> -->
+
+  <link rel="canonical" href="http://saurabhmathur96.github.io/blog/blog/machine-learning/2016/11/28/training-neural-nets-on-large-datasets.html" />
+
+  <link rel="alternate" type="application/rss+xml" title="Saurabh's Blog" href="http://saurabhmathur96.github.io/blog/blog/feed.xml" />
+</head>
+
+  <body>
+    <!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+	
+		
+		    
+		      <a href="/blog/">Blog</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/about/">About</a>
+		    
+	    
+  	
+		
+		    
+		      <a href="/blog/css/print.css"></a>
+		    
+	    
+  	
+		
+  	
+	</nav>
+</header>
+    <article class="group">
+      <h1>Lessons learned from training neural nets on large datasets</h1>
+<p class="subtitle">November 28, 2016</p>
+
+<p>This semester I have been trying to understand deep learning. Along the way I tried to implement some of the algorithms
+and use them to classify images.</p>
+
+<p>Since one of the main advantages of deep learning is that performance improves 
+linearly with data - having to deal with large amount of data 
+was inevitable. By large I do not mean the humongous datasets that are generally associated with distributed computing
+and such - I mean the kind of datasets that just fit into your RAM specifically the CIFAR-10 object recognition dataset.</p>
+
+<h2 id="0--the-setup">0 : The setup</h2>
+<p>I started off using my own thinkpad having 4GB RAM and running on an intel i3 processor. Later, I switched to
+an Azure A4 virtual machine as training deep neural nets is a memory hungry task and rendered my system unusable.</p>
+
+<h2 id="1--sample-and-test-">1 : Sample and test !</h2>
+<p>One of the mistakes that I made was going all guns blazing and using the entire dataset for training everytime 
+I made a change to the model. So, I ended up waiting as long as an entire day to find out that a learning rate of 0.01 is
+too high. Tuning the number and types of layers was a nightmare.</p>
+
+<p>A better way is to use a sample of the data and tune the hyper-parameters accordingly.</p>
+
+<h2 id="2--use-background-processes">2 : Use background processes</h2>
+<p>Daemons are long running background processes that keep running even if interactive sessions such a the terminal window
+are exited.
+I used <code class="highlighter-rouge">nohup</code> to create background processes on the VM on Azure.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nohup th train_cifar10.lua &lt; /dev/null &gt; ./log.txt 2&gt;&amp;1 &amp;
+</code></pre></div></div>
+
+<p>This was especially useful when I actually wanted to train the model on a larger portion of the training data. The advantage here being I don’t need to be sshed into
+the machine - I can login after some time and check if training has finished.</p>
+
+<h2 id="3--dont-reinvent-the-wheel">3 : Don’t reinvent the wheel</h2>
+<p>There are a lot of standard architectures and pre-trained models based on those architectures available. It is even possible
+to retrain just the final layer to reuse the image representations previously learnt. Examples of this are the Inception-v3 model
+available for tensorflow and many other pretrained models for Torch.</p>
+
+<h2 id="4--choose-the-right-deployment-framework">4 : Choose the right deployment framework</h2>
+<p>Since, most machine learning libraries use low level bindings to speed up computation, 
+cross platform compatibility is a nightmare.</p>
+
+<p>I use the free tier of heroku to experiment with web-apps and getting sklearn and numpy to work there was an 
+arduous process. Also, the pickles of models trained using one version of sklearn are not guaranteed to work with all other versions.
+Tensorflow has better compatibility and it was easier to deploy owing to better support of Google’s Protocol Buffers
+to save and load trained models. Here is a web-app that compares some neural nets on handwritten digit classification 
+that I made using Flask and Tensorflow - <a href="https://classifier-mnist.herokuapp.com/">https://classifier-mnist.herokuapp.com/</a>.</p>
+
+<p>Azure Machine Learning provides a simple interface to deploying custom and pre-built models as predictive services.</p>
+
+
+
+    </article>
+    <span class="print-footer">Lessons learned from training neural nets on large datasets - November 28, 2016 - Saurabh Mathur</span>
+    <footer>
+  <hr class="slender">
+  <ul class="footer-links">
+     
+    
+      <li>
+        <a href="//www.twitter.com/mathursaurabh96"><span class="icon-twitter"></span></a>
+      </li>
+    
+      <li>
+        <a href="//github.com/saurabhmathur96"><span class="icon-github"></span></a>
+      </li>
+      
+  </ul>
+<div class="credits">
+<span>&copy; 2019 &nbsp;&nbsp;SAURABH MATHUR</span><br>
+<span>This site created with the <a href="//github.com/clayh53/tufte-jekyll">Tufte theme for  </a> in <a href="//jekyllrb.com">Jekyll</a>.</span> 
+</div>  
+</footer>
+
+    <script>
+      MathJax.Hub.Config({
+          tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+            inlineMath: [['$','$'], ['\\(','\\)']]
+          }
+        });
+        MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                all[i].SourceElement().parentNode.className += ' has-jax';
+            }
+        });
+    </script>
+  </body>
+
+
+
+</html>
